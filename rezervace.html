@@ -1,0 +1,99 @@
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Načtení dat z LocalStorage
+        document.querySelectorAll(".day").forEach((day, index) => {
+            const inputField = day.querySelector("input[type='text']");
+            const checkPickup = day.querySelector("input[type='checkbox']:first-of-type");
+            const checkReturn = day.querySelector("input[type='checkbox']:last-of-type");
+
+            inputField.value = localStorage.getItem("name_" + index) || "";
+            checkPickup.checked = localStorage.getItem("pickup_" + index) === "true";
+            checkReturn.checked = localStorage.getItem("return_" + index) === "true";
+
+            // Uložení dat při změně
+            inputField.addEventListener("input", () => localStorage.setItem("name_" + index, inputField.value));
+            checkPickup.addEventListener("change", () => localStorage.setItem("pickup_" + index, checkPickup.checked));
+            checkReturn.addEventListener("change", () => localStorage.setItem("return_" + index, checkReturn.checked));
+        });
+    });
+</script>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REZERVACE KARCHER</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 10px; }
+        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .month { border: 2px solid #ccc; padding: 10px; text-align: center; background-color: #f9f9f9; }
+        .month h3 { background-color: #007FFF; color: white; padding: 5px; }
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day { border: 1px solid #ccc; padding: 5px; text-align: center; font-size: 14px; }
+        .date { background-color: #007FFF; color: white; padding: 3px; font-weight: bold; }
+        input[type="text"] { background-color: white; color: red; font-weight: bold; width: 90%; font-size: 12px; }
+        .checkbox-container { text-align: left; margin-top: 5px; }
+        input[type="checkbox"] { accent-color: orange; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>REZERVACE KARCHER / SVJ Brněnská 245</h2>
+    <p>
+        – u požadovaného data napište do pole své jméno<br>
+        – políčko Vyzvednutí a hlavně Vrácení odškrtnu sám pro případ, že by se třeba termín prodloužil (např. vlivem špatného počasí)
+    </p>
+    <div class="container">
+        <script>
+            const currentYear = new Date().getFullYear();
+            const months = ["Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen"];
+            const weekdays = ["Po", "Út", "St", "Čt", "Pá", "So", "Ne"]; // Začátek týdne v pondělí
+
+            months.forEach((month, index) => {
+                const daysInMonth = new Date(currentYear, index + 3, 0).getDate(); // Dynamický počet dní v měsíci
+
+                let monthDiv = document.createElement("div");
+                monthDiv.classList.add("month");
+                monthDiv.innerHTML = `<h3>${month} ${currentYear}</h3>`;
+
+                let weekdaysDiv = document.createElement("div");
+                weekdaysDiv.classList.add("weekdays");
+                weekdays.forEach(day => {
+                    let weekdaySpan = document.createElement("span");
+                    weekdaySpan.textContent = day;
+                    weekdaysDiv.appendChild(weekdaySpan);
+                });
+                monthDiv.appendChild(weekdaysDiv);
+
+                let calendarDiv = document.createElement("div");
+                calendarDiv.classList.add("calendar");
+
+                for (let i = 1; i <= daysInMonth; i++) {
+                    let dayDiv = document.createElement("div");
+                    dayDiv.classList.add("day");
+
+                    let dayFormatted = i.toString().padStart(2, '0');
+                    let monthFormatted = (index + 4).toString().padStart(2, '0');
+                    let weekDayIndex = (new Date(currentYear, index + 3, i).getDay() + 6) % 7; // Posun začátku týdne na pondělí
+                    let weekDay = weekdays[weekDayIndex];
+
+                    dayDiv.innerHTML = `
+                        <p class="date">${dayFormatted}.${monthFormatted}. – ${weekDay}</p>
+                        <input type="text" placeholder="Jméno">
+                        <div class="checkbox-container">
+                            <label><input type="checkbox"> Vyzvednutí</label><br>
+                            <label><input type="checkbox"> Vrácení</label>
+                        </div>
+                    `;
+                    calendarDiv.appendChild(dayDiv);
+                }
+
+                monthDiv.appendChild(calendarDiv);
+                document.querySelector(".container").appendChild(monthDiv);
+            });
+        </script>
+    </div>
+
+</body>
+</html>
